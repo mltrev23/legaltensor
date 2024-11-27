@@ -5,3 +5,6 @@ pytest>=8
 torch>=2
 numpy>=1
 setuptools>=68
+bittensor==8.3.1
+bittensor-cli==8.3.1
+bittensor-wallet==2.1.1
