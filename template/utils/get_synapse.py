@@ -4,7 +4,8 @@ from template.protocol import Challenge
 from template.utils.tasks import TASKS
 
 def get_synapse():
-    task_name = random.choice(TASKS)
+    # task_name = random.choice(TASKS)
+    task_name = 'abercrombie'
     
     dataset = datasets.load_dataset("nguha/legalbench", task_name)
     test_df = dataset["test"].to_pandas()
