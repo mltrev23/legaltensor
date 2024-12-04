@@ -3,7 +3,8 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 import datasets
 
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
+# device = 'cuda' if torch.cuda.is_available() else 'cpu'
+device = 'cpu'
 
 # Load the tokenizer and model
 tokenizer = AutoTokenizer.from_pretrained("Equall/Saul-7B-Instruct-v1")

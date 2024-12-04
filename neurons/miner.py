@@ -64,6 +64,7 @@ class Miner(BaseMinerNeuron):
         prompt = base_prompt.replace('{{text}}', synapse.problem)
         
         synapse.result = process(prompt)
+        bt.logging.debug(f'Respond synapse with {synapse}')
         
         return synapse
 
