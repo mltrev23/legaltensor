@@ -57,7 +57,6 @@ class BaseMinerNeuron(BaseNeuron):
         bt.logging.debug(f"self.config.axon.port: {self.config.axon.port}")
         self.axon = bt.axon(
             wallet=self.wallet,
-            port = 8092,
             config=self.config() if callable(self.config) else self.config,
         )
 

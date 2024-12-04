@@ -59,6 +59,7 @@ class Miner(BaseMinerNeuron):
         The 'forward' function is a placeholder and should be overridden with logic that is appropriate for
         the miner's intended operation. This method demonstrates a basic transformation of input data.
         """
+        bt.logging.debug(f'Challenge Synapse Received: {synapse}')
         base_prompt = PROMPTS[synapse.task_type]
         prompt = base_prompt.replace('{{text}}', synapse.problem)
         

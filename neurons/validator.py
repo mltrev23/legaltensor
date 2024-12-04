@@ -30,7 +30,7 @@ from template.base.validator import BaseValidatorNeuron
 from template.protocol import Challenge
 from template.utils.get_synapse import get_synapse
 from template.validator.reward import get_rewards
-from template.utils.uids import get_random_uids
+from template.utils.uids import get_miner_uids
 
 
 class Validator(BaseValidatorNeuron):
@@ -62,14 +62,19 @@ class Validator(BaseValidatorNeuron):
         """
         # TODO(developer): Define how the validator selects a miner to query, how often, etc.
         # get_random_uids is an example method, but you can replace it with your own.
-        miner_uids = get_random_uids(self, k=self.config.neuron.sample_size)
+        # miner_uids = get_miner_uids(self, k=self.config.neuron.sample_size)
+        miner_uids = [1]
+        miner_axons = [self.metagraph.axons[uid] for uid in miner_uids]
+        bt.logging.debug(f'Available miner_uids: {miner_uids}')
+        bt.logging.debug(f'Available miner_axons: {miner_axons}')
 
         synapse, answer = get_synapse()
         # The dendrite client queries the network.
         responses = await self.dendrite(
-            axons=[self.metagraph.axons[uid] for uid in miner_uids],
+            axons=miner_axons,
             synapse=synapse,
             deserialize=True,
+            timeout=60
         )
 
         # Log the results for monitoring purposes.
