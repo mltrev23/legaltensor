@@ -1,25 +1,21 @@
 # Use a pipeline as a high-level helper
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import pipeline
 import torch
 import datasets
 
-# device = 'cuda' if torch.cuda.is_available() else 'cpu'
-device = 'cpu'
-
-# Load the tokenizer and model
-tokenizer = AutoTokenizer.from_pretrained("Equall/Saul-7B-Instruct-v1")
-model = AutoModelForCausalLM.from_pretrained("Equall/Saul-7B-Instruct-v1").to(device)
+pipe = pipeline("text-generation", model="Equall/Saul-Instruct-v1", torch_dtype=torch.bfloat16, device_map="auto")
 
 def process(prompt: str):
-    # Prepare the input for the model
-    tokenizer.pad_token_id = tokenizer.eos_token_id  # or specify your own
+    messages = [
+        {"role": "user", "content": prompt},
+    ]
     
-    inputs = tokenizer(prompt, return_tensors="pt", padding=True, truncation=True, max_length=512).to(device)
-    input_ids = inputs['input_ids']
-    attention_mask = inputs['attention_mask']
+    prompt = pipe.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+    outputs = pipe(prompt, max_new_tokens=256, do_sample=False)
+    full_output = outputs[0]["generated_text"]
 
-    # Generate a response
-    output = model.generate(input_ids, attention_mask=attention_mask, max_length=1000, num_return_sequences=1, pad_token_id=tokenizer.pad_token_id)
+    # Remove the input prompt from the output
+    generated_text = full_output[len(prompt):].strip()
 
-    # Decode the generated output
-    return tokenizer.decode(output[0], skip_special_tokens=True)
+    # Print the generated response
+    return generated_text
