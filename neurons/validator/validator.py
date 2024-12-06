@@ -82,7 +82,7 @@ class Validator(BaseValidatorNeuron):
 
         # TODO(developer): Define how the validator scores responses.
         # Adjust the scores based on responses from miners.
-        rewards = get_rewards(self, answer=answer, responses=responses)
+        rewards = get_rewards(self, task_type=synapse.task_type, answer=answer, responses=responses)
 
         bt.logging.info(f"Scored responses: {rewards}")
         # Update the scores based on the rewards. You may want to define your own update_scores function for custom behavior.
