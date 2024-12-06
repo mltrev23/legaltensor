@@ -51,7 +51,7 @@ class Challenge(bt.Synapse):
 
     # Required request input, filled by sending dendrite caller.
     task_type: str
-    problem: str
+    problem: dict[str, str]
 
     # Optional request output, filled by receiving axon.
     result: typing.Optional[str] = None

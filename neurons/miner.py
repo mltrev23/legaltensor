@@ -61,7 +61,7 @@ class Miner(BaseMinerNeuron):
         """
         bt.logging.debug(f'Challenge Synapse Received: {synapse}')
         base_prompt = PROMPTS[synapse.task_type]
-        prompt = base_prompt.replace('{{text}}', synapse.problem)
+        prompt = base_prompt.format(**synapse.problem)
         
         synapse.result = process(prompt)
         bt.logging.debug(f'Respond synapse with {synapse}')
