@@ -28,8 +28,8 @@ from template.base.validator import BaseValidatorNeuron
 
 # Bittensor Validator Template:
 from template.protocol import Challenge
-from template.utils.get_synapse import get_synapse
-from template.validator.reward import get_rewards
+from neurons.validator.get_synapse import get_synapse
+from neurons.validator.reward import get_rewards
 from template.utils.uids import get_miner_uids
 
 

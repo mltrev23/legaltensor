@@ -26,8 +26,8 @@ import template
 
 # import base miner class which takes care of most of the boilerplate
 from template.base.miner import BaseMinerNeuron
-from template.utils.miner_prompts import PROMPTS
-from template.utils.miner_model import process
+from neurons.miner.miner_prompts import PROMPTS
+from neurons.miner.miner_model import process
 
 class Miner(BaseMinerNeuron):
     """
