@@ -26,7 +26,7 @@ from neurons.validator import Validator
 from template.base.validator import BaseValidatorNeuron
 from template.protocol import Challenge
 from template.utils.uids import get_random_uids
-from template.validator.reward import get_rewards
+from neurons.validator.reward import get_rewards
 
 
 class TemplateValidatorNeuronTestCase(unittest.TestCase):

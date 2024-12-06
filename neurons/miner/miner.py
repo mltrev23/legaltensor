@@ -26,7 +26,7 @@ import template
 
 # import base miner class which takes care of most of the boilerplate
 from template.base.miner import BaseMinerNeuron
-from neurons.miner.miner_prompts import PROMPTS
+from neurons.miner.miner_prompts import read_prompts_from_file
 from neurons.miner.miner_model import process
 
 class Miner(BaseMinerNeuron):
@@ -60,7 +60,7 @@ class Miner(BaseMinerNeuron):
         the miner's intended operation. This method demonstrates a basic transformation of input data.
         """
         bt.logging.debug(f'Challenge Synapse Received: {synapse}')
-        base_prompt = PROMPTS[synapse.task_type]
+        base_prompt = read_prompts_from_file(synapse.task_type)
         prompt = base_prompt.format(**synapse.problem)
         
         synapse.result = process(prompt)

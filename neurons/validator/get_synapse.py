@@ -1,11 +1,10 @@
 import random
 import datasets
 from template.protocol import Challenge
-from template.validator.tasks import TASKS
+from neurons.validator.tasks import TASKS
 
 def get_synapse():
-    # task_name = random.choice(TASKS)
-    task_name = 'abercrombie'
+    task_name = random.choice(TASKS)
     
     dataset = datasets.load_dataset("nguha/legalbench", task_name)
     test_df = dataset["test"].to_pandas()
