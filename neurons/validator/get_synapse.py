@@ -1,20 +1,17 @@
-import random
-import datasets
+import os
+import requests
+
 from template.protocol import Challenge
-from neurons.validator.tasks import TASKS
 
 def get_synapse():
-    task_name = random.choice(TASKS)
-    
-    dataset = datasets.load_dataset("nguha/legalbench", task_name)
-    test_df = dataset["test"].to_pandas()
-    test_df = test_df.drop(columns=['index'])
-    
-    rand_entry = test_df.sample(n=1)
-    output = rand_entry['answer'].values[0]
-    input = rand_entry.drop(columns=['answer']).to_dict(orient='records')[0]
-    
-    return Challenge(task_type=task_name, problem=input), output
+    try:
+        data_server_url = os.environ.get('DATA_SERVER_URL')
+        response = requests.get(data_server_url)
+        data = response.json()
+        return Challenge(task_type=data.task_type, problem=data.input), data.output
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None
 
 if __name__ == '__main__':
     get_synapse()
