@@ -12,3 +12,6 @@ transformers
 datasets
 scikit-learn
 nltk
+openai
+python-dotenv
+asyncio
