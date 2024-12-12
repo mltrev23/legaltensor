@@ -62,18 +62,18 @@ def generate_synapse_using_openai():
     return Challenge(task_type=task_name, problem=json.loads(input)), output
     
 def get_synapse():
-    attempts = 3
-    while attempts > 0:
-        synapse = get_synapse_from_server()
-        if synapse:
-            return synapse
-        logging.info(f'Failed to get synapse from server. Attempts {4 - attempts}...')
-        retry_in = (4 - attempts) * 200 + 500
-        logging.info(f'Retrying in {retry_in} milliseconds...')
-        time.sleep(retry_in / 1000)
-        attempts -= 1
+    # attempts = 3
+    # while attempts > 0:
+    #     synapse = get_synapse_from_server()
+    #     if synapse:
+    #         return synapse
+    #     logging.info(f'Failed to get synapse from server. Attempts {4 - attempts}...')
+    #     retry_in = (4 - attempts) * 200 + 500
+    #     logging.info(f'Retrying in {retry_in} milliseconds...')
+    #     time.sleep(retry_in / 1000)
+    #     attempts -= 1
 
-    generate_synapse_using_openai()
+    synapse = generate_synapse_using_openai()
     if synapse:
         return synapse
 if __name__ == '__main__':
