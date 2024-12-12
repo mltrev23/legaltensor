@@ -24,7 +24,7 @@ def get_synapse_from_server():
         print(f"An error occurred: {e}")
         return None
 
-async def generate_synapse_using_openai():
+def generate_synapse_using_openai():
     client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
     task_name = random.choice(TASKS)
     print(f'Task Name: {task_name}')
@@ -40,20 +40,26 @@ async def generate_synapse_using_openai():
     
     user_prompt = f"Q: {input}\nA: {output}"
         
-    response = await client.chat.completions.create(
+    response = client.chat.completions.create(
         model = 'gpt-4',
         messages = [{
             'role': 'system',
             'content': system_prompt
         }, {
+            'role': 'system',
+            'content': 'Create a new task following the rules above and make reference to examples below. Task format: Q: ...\nA: ...\n'
+        }, {
             'role': 'user',
             'content': user_prompt
         }]
     )
-    print(response)
-    input = response.split('Q:')[1].split('A:')[0]
-    output = response.split('A:')[1]
-    return Challenge(task_type=task_name, problem=json.load(input)), output
+    response = response.choices[0].message.content
+    
+    input = response.split('Q: ')[1].split('A: ')[0]
+    output = response.split('A: ')[1]
+    input.replace("'", '"')
+    
+    return Challenge(task_type=task_name, problem=json.loads(input)), output
     
 def get_synapse():
     attempts = 3
@@ -67,8 +73,8 @@ def get_synapse():
         time.sleep(retry_in / 1000)
         attempts -= 1
 
-    synapse = asyncio.run(generate_synapse_using_openai())
+    generate_synapse_using_openai()
     if synapse:
         return synapse
 if __name__ == '__main__':
-    asyncio.run(generate_synapse_using_openai())
+    generate_synapse_using_openai()
