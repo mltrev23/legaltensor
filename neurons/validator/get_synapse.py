@@ -1,11 +1,12 @@
 import os
 import requests
-from openai import OpenAI
 import random
 import time
+import json
 import logging
 import asyncio
-import datasets
+import pandas as pd
+from openai import OpenAI
 from dotenv import load_dotenv
 from neurons.validator.tasks import TASKS
 
@@ -28,13 +29,9 @@ async def generate_synapse_using_openai():
     task_name = random.choice(TASKS)
     print(f'Task Name: {task_name}')
     
-    system_propmt_url = f'https://github.com/HazyResearch/legalbench/blob/main/tasks/{task_name}/README.md'
-    example_url = f'https://github.com/HazyResearch/legalbench/blob/main/tasks/{task_name}/train.tsv'
-    system_prompt = requests.get(system_propmt_url).content
-    print(system_prompt)
+    system_prompt = open(f'./legalbench/tasks/{task_name}/README.md').read()
     
-    dataset = datasets.load_dataset("nguha/legalbench", task_name)
-    test_df = dataset["train"].to_pandas()
+    test_df = pd.read_csv(f'./legalbench/tasks/{task_name}/train.tsv', sep='\t')
     test_df = test_df.drop(columns=['index'])
     
     rand_entry = test_df.sample(n=1)
@@ -42,13 +39,12 @@ async def generate_synapse_using_openai():
     input = rand_entry.drop(columns=['answer']).to_dict(orient='records')[0]
     
     user_prompt = f"Q: {input}\nA: {output}"
-    print(user_prompt)
         
     response = await client.chat.completions.create(
         model = 'gpt-4',
         messages = [{
             'role': 'system',
-            'content': "Given the following examples, generate a similar question and answer. Only return the new question and anwer."
+            'content': system_prompt
         }, {
             'role': 'user',
             'content': user_prompt
@@ -57,7 +53,7 @@ async def generate_synapse_using_openai():
     print(response)
     input = response.split('Q:')[1].split('A:')[0]
     output = response.split('A:')[1]
-    return Challenge(task_type=task_name, problem=input), output
+    return Challenge(task_type=task_name, problem=json.load(input)), output
     
 def get_synapse():
     attempts = 3
