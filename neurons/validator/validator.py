@@ -27,7 +27,10 @@ import bittensor as bt
 from template.base.validator import BaseValidatorNeuron
 
 # Bittensor Validator Template:
-from template.validator import forward
+from template.protocol import Challenge
+from neurons.validator.get_synapse import get_synapse
+from neurons.validator.reward import get_rewards
+from template.utils.uids import get_miner_uids
 
 
 class Validator(BaseValidatorNeuron):
@@ -49,15 +52,43 @@ class Validator(BaseValidatorNeuron):
 
     async def forward(self):
         """
-        Validator forward pass. Consists of:
-        - Generating the query
-        - Querying the miners
-        - Getting the responses
-        - Rewarding the miners
-        - Updating the scores
+        The forward function is called by the validator every time step.
+
+        It is responsible for querying the network and scoring the responses.
+
+        Args:
+            self (:obj:`bittensor.neuron.Neuron`): The neuron object which contains all the necessary state for the validator.
+
         """
-        # TODO(developer): Rewrite this function based on your protocol definition.
-        return await forward(self)
+        # TODO(developer): Define how the validator selects a miner to query, how often, etc.
+        # get_random_uids is an example method, but you can replace it with your own.
+        miner_uids = get_miner_uids(self, k=self.config.neuron.sample_size)
+        # miner_uids = [1]
+        miner_axons = [self.metagraph.axons[uid] for uid in miner_uids]
+        bt.logging.debug(f'Available miner_uids: {miner_uids}')
+        bt.logging.debug(f'Available miner_axons: {miner_axons}')
+
+        synapse, answer = get_synapse()
+        bt.logging.debug(f'Generate synapse: {synapse}')
+        # The dendrite client queries the network.
+        responses = await self.dendrite(
+            axons=miner_axons,
+            synapse=synapse,
+            deserialize=True,
+            timeout=60
+        )
+
+        # Log the results for monitoring purposes.
+        bt.logging.info(f"Received responses: {responses}")
+
+        # TODO(developer): Define how the validator scores responses.
+        # Adjust the scores based on responses from miners.
+        rewards = get_rewards(self, task_type=synapse.task_type, answer=answer, responses=responses)
+
+        bt.logging.info(f"Scored responses: {rewards}")
+        # Update the scores based on the rewards. You may want to define your own update_scores function for custom behavior.
+        self.update_scores(rewards, miner_uids)
+        time.sleep(5)
 
 
 # The main function parses the configuration and runs the validator.

@@ -1,0 +1,3 @@
+[submodule "legalbench"]
+	path = legalbench
+	url = https://github.com/HazyResearch/legalbench.git
