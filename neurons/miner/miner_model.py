@@ -1,7 +1,6 @@
 # Use a pipeline as a high-level helper
 from transformers import pipeline
 import torch
-import datasets
 
 pipe = pipeline("text-generation", model="Equall/Saul-Instruct-v1", torch_dtype=torch.bfloat16, device_map="auto")
 

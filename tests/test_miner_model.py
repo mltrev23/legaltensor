@@ -1,3 +1,6 @@
+from neurons.miner.miner_model import process
+
+prompt = """
 A mark is generic if it is the common name for the product. A mark is descriptive if it describes a purpose, nature, or attribute of the product. A mark is suggestive if it suggests or implies a quality or characteristic of the product. A mark is arbitrary if it is a real English word that has no relation to the product. A mark is fanciful if it is an invented word.
 
 Q: The mark "Ivory" for a product made of elephant tusks. What is the type of mark?
@@ -13,7 +16,11 @@ Q: The mark "Virgin" for wireless communications. What is the type of mark?
 A: arbitrary
 
 Q: The mark "Aswelly" for a taxi service. What is the type of mark?
-A: fanciful
+A: 
+"""
 
-Q: {{text}} What is the type of mark?
-A:
+def test_process():
+    response = process(prompt)
+    assert response is not None
+    
+    print(response)

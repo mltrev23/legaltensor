@@ -77,5 +77,3 @@ def get_synapse():
     synapse = generate_synapse_using_openai()
     if synapse:
         return synapse
-if __name__ == '__main__':
-    generate_synapse_using_openai()
