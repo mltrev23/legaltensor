@@ -29,11 +29,7 @@ def get_synapse_from_server():
         print(f"An error occurred: {e}")
         return None
 
-def generate_synapse_using_openai():
-    client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
-    task_name = random.choice(TASKS)
-    print(f'Task Name: {task_name}')
-    
+def generate_prompts(task_name):
     system_prompt = open(f'./legalbench/tasks/{task_name}/README.md').read()
     
     test_df = pd.read_csv(f'./legalbench/tasks/{task_name}/train.tsv', sep='\t')
@@ -44,6 +40,16 @@ def generate_synapse_using_openai():
     input = rand_entry.drop(columns=['answer']).iloc[0].to_json()
     
     user_prompt = f"Q: {input}\nA: {output}"
+    
+    return system_prompt, user_prompt
+
+def generate_synapse_using_openai():
+    task_name = random.choice(TASKS)
+    print(f'Task Name: {task_name}')
+    
+    system_prompt, user_prompt = generate_prompts(task_name)
+    
+    client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
         
     response = client.chat.completions.create(
         model = 'gpt-4',
@@ -61,6 +67,8 @@ def generate_synapse_using_openai():
     output = response.split('A: ')[1]
     
     return Challenge(task_type=task_name, problem=json.loads(input)), output
+
+def generate_synapse_using_llama():
     
 def get_synapse():
     # attempts = 3
