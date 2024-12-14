@@ -41,7 +41,7 @@ def generate_synapse_using_openai():
     
     rand_entry = test_df.sample(n=1)
     output = rand_entry['answer'].values[0]
-    input = rand_entry.drop(columns=['answer']).to_dict(orient='records')[0]
+    input = rand_entry.drop(columns=['answer']).iloc[0].to_json()
     
     user_prompt = f"Q: {input}\nA: {output}"
         
@@ -56,12 +56,9 @@ def generate_synapse_using_openai():
         }]
     )
     response = response.choices[0].message.content
-    print(f'response: {response}')
     
     input = response.split('Q: ')[1].split('A: ')[0]
     output = response.split('A: ')[1]
-    print(f'input: {input}')
-    print(f'output: {output}')
     
     return Challenge(task_type=task_name, problem=json.loads(input)), output
     

@@ -69,6 +69,7 @@ class Validator(BaseValidatorNeuron):
         bt.logging.debug(f'Available miner_axons: {miner_axons}')
 
         synapse, answer = get_synapse()
+        bt.logging.debug(f'Generate synapse: {synapse}')
         # The dendrite client queries the network.
         responses = await self.dendrite(
             axons=miner_axons,
