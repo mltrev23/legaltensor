@@ -2,11 +2,13 @@ import os
 import requests
 import random
 import json
+import torch
 import pandas as pd
 import bittensor as bt
 from openai import OpenAI
 from dotenv import load_dotenv
 from neurons.validator.tasks import TASKS
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
 from template.protocol import Challenge
 
@@ -18,6 +20,9 @@ Ensure that the question (Q) is in JSON format and the answer (A) provides a cle
 
 {examples}
 """
+
+MODELS = dict()
+device = torch.device('cuda' if torch.cuda_is_available else 'cpu')
 
 def get_synapse_from_server():
     try:
@@ -43,23 +48,27 @@ def generate_prompts(task_name):
     
     return system_prompt, user_prompt
 
+def generate_chat_completion_message(system_prompt, user_prompt):
+    return [{
+        'role': 'system',
+        'content': system_prompt
+    }, {
+        'role': 'user',
+        'content': task_creation_prompt.format(examples = user_prompt)
+    }]
+
 def generate_synapse_using_openai():
     task_name = random.choice(TASKS)
     print(f'Task Name: {task_name}')
     
     system_prompt, user_prompt = generate_prompts(task_name)
+    chat_completion_message = generate_chat_completion_message(system_prompt, user_prompt)
     
     client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
         
     response = client.chat.completions.create(
         model = 'gpt-4',
-        messages = [{
-            'role': 'system',
-            'content': system_prompt
-        }, {
-            'role': 'user',
-            'content': task_creation_prompt.format(examples = user_prompt)
-        }]
+        messages = chat_completion_message
     )
     response = response.choices[0].message.content
     
@@ -68,7 +77,61 @@ def generate_synapse_using_openai():
     
     return Challenge(task_type=task_name, problem=json.loads(input)), output
 
+def load_llama(device = torch.device("cuda" if torch.cuda.is_available() else "cpu")):
+    
+    model_id = "cognitivecomputations/dolphin-2.9.4-llama3.1-8b"
+
+    quant_config = BitsAndBytesConfig(
+        load_in_4bit=True,           # This flag is now part of BitsAndBytesConfig
+        bnb_4bit_use_double_quant=True,  # Optional, for double quantization
+        bnb_4bit_quant_type="nf4",   # Choose between 'fp4' or 'nf4' (Non-negative quantization)
+    )
+
+    if not hasattr(AutoModelForCausalLM, 'cached_model'):
+        AutoModelForCausalLM.cached_model = AutoModelForCausalLM.from_pretrained(
+            model_id,
+            quantization_config=quant_config,  # 4-bit Quantization config
+            torch_dtype=torch.bfloat16,        # Mixed precision (optional, use bfloat16 for efficiency)
+        ).to(device)
+    model = AutoModelForCausalLM.cached_model
+    tokenizer = AutoTokenizer.from_pretrained(model_id)
+
+    return model, tokenizer
+
 def generate_synapse_using_llama():
+    task_name = random.choice(TASKS)
+    print(f'Task Name: {task_name}')
+    
+    system_prompt, user_prompt = generate_prompts(task_name)
+    chat_completion_message = generate_chat_completion_message(system_prompt, user_prompt)
+    
+    # If model already exists ...
+    if 'llama' not in MODELS:
+        MODELS['llama'] = load_llama(device)
+    model, tokenizer = MODELS['llama']
+    
+    def preprocess_message(messages):
+        text = [f"<|im_start|>{message['role']}\n{message['content']}<|im_end|>" for message in messages]
+        text = "\n".join(text)
+        return f'{text.strip()}<|im_start|>assistant'
+
+    message = preprocess_message(chat_completion_message)
+
+    # Prepare the input question
+    input_ids = tokenizer.encode(message, return_tensors="pt").to(device)
+
+    # Generate answer
+    with torch.no_grad():
+        output_ids = model.generate(input_ids, max_length=400, num_return_sequences = 1).to(device)
+
+    # Decode the generated answer
+    output_answer = tokenizer.decode(output_ids[0], skip_special_tokens=True)
+    output_answer = output_answer.split("<|im_start|>assistant")[1].strip()
+    
+    input = output_answer.split('Q: ')[1].split('A: ')[0]
+    output = output_answer.split('A: ')[1]
+
+    return Challenge(task_type=task_name, problem=json.loads(input)), output
     
 def get_synapse():
     # attempts = 3
