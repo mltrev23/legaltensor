@@ -1,11 +1,9 @@
 import os
 import requests
 import random
-import time
 import json
-import logging
-import asyncio
 import pandas as pd
+import bittensor as bt
 from openai import OpenAI
 from dotenv import load_dotenv
 from neurons.validator.tasks import TASKS
@@ -13,6 +11,13 @@ from neurons.validator.tasks import TASKS
 from template.protocol import Challenge
 
 load_dotenv()
+
+task_creation_prompt = """
+Please create a new task using the specified format below.
+Ensure that the question (Q) is in JSON format and the answer (A) provides a clear and concise response.
+
+{examples}
+"""
 
 def get_synapse_from_server():
     try:
@@ -46,18 +51,17 @@ def generate_synapse_using_openai():
             'role': 'system',
             'content': system_prompt
         }, {
-            'role': 'system',
-            'content': 'Create a new task following the rules above and make reference to examples below. Task format: Q: ...\nA: ...\n'
-        }, {
             'role': 'user',
-            'content': user_prompt
+            'content': task_creation_prompt.format(examples = user_prompt)
         }]
     )
     response = response.choices[0].message.content
+    print(f'response: {response}')
     
     input = response.split('Q: ')[1].split('A: ')[0]
     output = response.split('A: ')[1]
-    input.replace("'", '"')
+    print(f'input: {input}')
+    print(f'output: {output}')
     
     return Challenge(task_type=task_name, problem=json.loads(input)), output
     
