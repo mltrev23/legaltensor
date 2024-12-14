@@ -16,3 +16,4 @@ openai
 python-dotenv
 asyncio
 accelerate
+bitsandbytes

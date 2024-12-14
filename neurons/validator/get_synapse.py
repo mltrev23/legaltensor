@@ -22,7 +22,7 @@ Ensure that the question (Q) is in JSON format and the answer (A) provides a cle
 """
 
 MODELS = dict()
-device = torch.device('cuda' if torch.cuda_is_available else 'cpu')
+device = torch.device('cuda' if torch.cuda.is_available else 'cpu')
 
 def get_synapse_from_server():
     try:
@@ -132,7 +132,27 @@ def generate_synapse_using_llama():
     output = output_answer.split('A: ')[1]
 
     return Challenge(task_type=task_name, problem=json.loads(input)), output
-    
+
+synapse_generation_methods = {
+    generate_synapse_using_openai: 0.5,
+    generate_synapse_using_llama: 0.5,
+}
+
+def function_selector(function_ratios):
+    total = sum(function_ratios.values())
+    cumulative = []
+    current_sum = 0
+
+    for func, ratio in function_ratios.items():
+        current_sum += ratio
+        cumulative.append((current_sum / total, func))
+
+    # Generate a random number and select the corresponding function
+    rand = random.random()
+    for threshold, func in cumulative:
+        if rand <= threshold:
+            return func
+
 def get_synapse():
     # attempts = 3
     # while attempts > 0:
@@ -145,6 +165,8 @@ def get_synapse():
     #     time.sleep(retry_in / 1000)
     #     attempts -= 1
 
-    synapse = generate_synapse_using_openai()
-    if synapse:
-        return synapse
+    func = function_selector(synapse_generation_methods)
+    synapse = func()
+    bt.logging.info(f'Synapse generated: {synapse}')
+    
+    return synapse
