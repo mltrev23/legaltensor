@@ -60,14 +60,26 @@ Legaltensor operates as a Bittensor subnet with a miner-validator structure:
    export PYTHONPATH=.
    ```
 
-#### Run Miner
+#### Run miner
    ```bash
-   python miner.py --subtensor.network test --testnet 205 --wallet.name [wallet name] --wallet.hotkey [wallet.hotkey]
+   python neurons/miner/miner.py --subtensor.network test --testnet 205 --wallet.name [wallet name] --wallet.hotkey [wallet.hotkey]
    ```
 
 #### Run validator
    ```bash
-   python validator.py --subtensor.network test --testnet 205 --wallet.name [wallet name] --wallet.hotkey [wallet.hotkey]
+   python neurons/validator/validator.py --subtensor.network test --testnet 205 --wallet.name [wallet name] --wallet.hotkey [wallet.hotkey]
+   ```
+
+### Run with pm2
+
+#### Run miner using pm2
+   ```bash
+   pm2 start python --name legaltensor-miner -- neurons/miner/miner.py --subtensor.network test --testnet 205 --wallet.name [wallet name] --wallet.hotkey [wallet.hotkey]
+   ```
+
+#### Run validator using pm2
+   ```bash
+   pm2 start python --name legaltensor-validator -- neurons/validator/validator.py --subtensor.network test --testnet 205 --wallet.name [wallet name] --wallet.hotkey [wallet.hotkey]
    ```
 
 ---

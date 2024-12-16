@@ -32,7 +32,7 @@ def get_synapse_from_server():
         data = response.json()
         return Challenge(task_type=data['task_type'], problem=data['input']), data.output
     except Exception as e:
-        print(f"An error occurred: {e}")
+        bt.logging.error(f"An error occurred: {e}")
         return None
 
 def generate_prompts(task_name):
@@ -60,7 +60,6 @@ def generate_chat_completion_message(system_prompt, user_prompt):
 
 def generate_synapse_using_openai():
     task_name = random.choice(TASKS)
-    print(f'Task Name: {task_name}')
     
     system_prompt, user_prompt = generate_prompts(task_name)
     chat_completion_message = generate_chat_completion_message(system_prompt, user_prompt)
@@ -101,7 +100,6 @@ def load_llama(device = torch.device("cuda" if torch.cuda.is_available() else "c
 
 def generate_synapse_using_llama():
     task_name = random.choice(TASKS)
-    print(f'Task Name: {task_name}')
     
     system_prompt, user_prompt = generate_prompts(task_name)
     chat_completion_message = generate_chat_completion_message(system_prompt, user_prompt)
