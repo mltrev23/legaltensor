@@ -17,8 +17,10 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-
+import os
 import time
+import wandb
+from datetime import datetime
 
 # Bittensor
 import bittensor as bt
@@ -47,8 +49,51 @@ class Validator(BaseValidatorNeuron):
 
         bt.logging.info("load_state()")
         self.load_state()
-
-        # TODO(developer): Anything specific to your use case you can do here
+        self.init_wandb()
+        
+    def __del__(self):
+        if self.wandb_run is not None:
+            self.wandb_run.finish()
+    
+    def init_wandb(self):
+        self.wandb_run = None
+        self.wandb_run_start = None
+        
+        wandb_api_key = os.getenv("WANDB_API_KEY")
+        if wandb_api_key is not None:
+            bt.logging.info("Logging into wandb.")
+            wandb.login(key=wandb_api_key)
+        else:
+            bt.logging.warning("WANDB_API_KEY not found in environment variables.")
+            return
+        
+        if not self.config.wandb.off:
+            if self.config.subtensor.network == "finney":
+                self.wandb_project_name = "legaltensor"
+            else:
+                self.wandb_project_name = "legaltensor-test"
+            self.wandb_entity = "legaltensor"
+            self.new_wandb_run()
+    
+    def new_wandb_run(self):
+        """Creates a new wandb run to save information to."""
+        now = datetime.now()
+        self.wandb_run_start = now
+        run_id = now.strftime("%Y-%m-%d-%H-%M-%S")
+        name = f"validator-{self.uid}"
+        self.wandb_run = wandb.init(
+            project=self.wandb_project_name,
+            name=name,
+            entity=self.wandb_entity,
+            config={
+                "uid": self.uid,
+                "run_id": run_id,
+                "hotkey": self.wallet.hotkey.ss58_address,
+                "type": "validator",
+            },
+            reinit=True,
+        )
+        bt.logging.debug(f"Started a new wandb run: {name}")
 
     async def forward(self):
         """
