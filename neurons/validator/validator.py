@@ -52,7 +52,7 @@ class Validator(BaseValidatorNeuron):
         self.init_wandb()
         
     def __del__(self):
-        if self.wandb_run is not None:
+        if hasattr(self, 'wandb_run') and self.wandb_run is not None:
             self.wandb_run.finish()
     
     def init_wandb(self):
