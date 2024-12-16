@@ -15,9 +15,10 @@ from template.protocol import Challenge
 load_dotenv()
 
 task_creation_prompt = """
-Please create a new task using the specified format below.
+Please create a new task and sample output using the specified format below.
 Ensure that the question (Q) is in JSON format and the answer (A) provides a clear and concise response.
 
+Example here: 
 {examples}
 """
 
@@ -134,8 +135,8 @@ def generate_synapse_using_llama():
     return Challenge(task_type=task_name, problem=json.loads(input)), output
 
 synapse_generation_methods = {
-    generate_synapse_using_openai: 0.5,
-    generate_synapse_using_llama: 0.5,
+    generate_synapse_using_openai: 1,
+    generate_synapse_using_llama: 0,
 }
 
 def function_selector(function_ratios):
