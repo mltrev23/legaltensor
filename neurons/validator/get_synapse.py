@@ -15,9 +15,10 @@ from template.protocol import Challenge
 load_dotenv()
 
 task_creation_prompt = """
-Please create a new task using the specified format below.
+Please create a new task and sample output using the specified format below.
 Ensure that the question (Q) is in JSON format and the answer (A) provides a clear and concise response.
 
+Example here: 
 {examples}
 """
 
