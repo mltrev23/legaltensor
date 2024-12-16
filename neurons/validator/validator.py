@@ -108,7 +108,6 @@ class Validator(BaseValidatorNeuron):
         # TODO(developer): Define how the validator selects a miner to query, how often, etc.
         # get_random_uids is an example method, but you can replace it with your own.
         miner_uids = get_miner_uids(self, k=self.config.neuron.sample_size)
-        # miner_uids = [1]
         miner_axons = [self.metagraph.axons[uid] for uid in miner_uids]
         bt.logging.debug(f'Available miner_uids: {miner_uids}')
         bt.logging.debug(f'Available miner_axons: {miner_axons}')
