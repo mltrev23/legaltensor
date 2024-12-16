@@ -135,8 +135,8 @@ def generate_synapse_using_llama():
     return Challenge(task_type=task_name, problem=json.loads(input)), output
 
 synapse_generation_methods = {
-    generate_synapse_using_openai: 1,
-    generate_synapse_using_llama: 0,
+    generate_synapse_using_openai: 0.5,
+    generate_synapse_using_llama: 0.5,
 }
 
 def function_selector(function_ratios):
