@@ -43,13 +43,18 @@ Legaltensor operates as a Bittensor subnet with a miner-validator structure:
    cd legaltensor
    ```
 
-2. Environment:
+2. Init the submodule:
+   ```bash
+   git submodule update --init
+   ```
+
+3. Environment:
    ```bash
    python3 -m venv venv
    source venv/bin/activate
    ```
 
-3. Install Dependencies:
+4. Install Dependencies:
    ```bash
    pip3 install -r requirements.txt
    export PYTHONPATH=.
