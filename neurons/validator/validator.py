@@ -29,9 +29,10 @@ import bittensor as bt
 from template.base.validator import BaseValidatorNeuron
 
 # Bittensor Validator Template:
-from template.protocol import Challenge
+from template.protocol import TaskContributionSynapse
 from neurons.validator.get_synapse import get_synapse
 from neurons.validator.reward import get_rewards
+from neurons.validator.task_validator import TaskValidatorServer
 from template.utils.uids import get_miner_uids
 
 
@@ -50,6 +51,9 @@ class Validator(BaseValidatorNeuron):
         bt.logging.info("load_state()")
         self.load_state()
         self.init_wandb()
+
+        self.task_approver = TaskValidatorServer()
+        self.task_approver.run()
         
     def __del__(self):
         if hasattr(self, 'wandb_run') and self.wandb_run is not None:

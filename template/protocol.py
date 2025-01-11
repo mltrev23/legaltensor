@@ -63,3 +63,9 @@ class Challenge(bt.Synapse):
         as the output of the dendrite.query() call.
         """
         return self.result
+
+class TaskContributionSynapse(bt.Synapse):
+    readme: str
+    prompt: str
+    train_data: str
+    test_data: str

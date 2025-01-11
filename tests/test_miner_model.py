@@ -1,4 +1,4 @@
-from neurons.miner.miner_model import process
+from legaltensor.legaltensor.neurons.llms.saul_lm import process
 
 prompt = """
 A mark is generic if it is the common name for the product. A mark is descriptive if it describes a purpose, nature, or attribute of the product. A mark is suggestive if it suggests or implies a quality or characteristic of the product. A mark is arbitrary if it is a real English word that has no relation to the product. A mark is fanciful if it is an invented word.
