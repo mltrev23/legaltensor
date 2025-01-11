@@ -27,7 +27,7 @@ import template
 # import base miner class which takes care of most of the boilerplate
 from template.base.miner import BaseMinerNeuron
 from neurons.miner.miner_prompts import read_prompts_from_file
-from legaltensor.legaltensor.neurons.llms.saul_lm import process
+from neurons.llms.saul_lm import process
 
 class Miner(BaseMinerNeuron):
     """

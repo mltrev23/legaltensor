@@ -25,7 +25,7 @@ def load_llama(device = torch.device("cuda" if torch.cuda.is_available() else "c
 
 model, tokenizer = load_llama()
 
-def process(prompt: str, device = torch.device("cuda" if torch.cuda.is_available() else "cpu")):
+def process_with_llama(prompt: str, device = torch.device("cuda" if torch.cuda.is_available() else "cpu")):
     """
     Process a list of messages.
 

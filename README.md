@@ -39,7 +39,7 @@ Legaltensor operates as a Bittensor subnet with a miner-validator structure:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/LegalTensor/legaltensor.git
+   git clone https://github.com/LegalTensor/git
    cd legaltensor
    ```
 

@@ -7,7 +7,15 @@ from io import StringIO
 import pandas as pd
 import numpy as np
 
-from legaltensor.legaltensor.neurons.llms.saul_lm import process
+from neurons.llms.saul_lm import process
+from neurons.llms.llama import process_with_llama
+
+part_of_task_classification_prompt = """
+You are an expert in task classification. Analyze the following task description and determine its relevance to the legal domain. Provide a score between 0 and 1, where 0 indicates no relevance and 1 indicates full relevance. Respond in the following JSON format: {{"legal_relevance_score": score}}
+
+Task Description:
+{task_description}
+"""
 
 def get_ip_address():
     try:
@@ -70,8 +78,8 @@ class ScoringEngine:
         return sum(scores) / k
 
     def calculate_bonus(self, readme_md):
-        return 1 if "special" in readme_md.lower() else 0.0
-
+        system_prompt = part_of_task_classification_prompt.format(task_description = readme_md)
+        return float(process_with_llama(system_prompt))
 
 class TaskValidatorServer:
     def __init__(self, vector_db):
@@ -92,20 +100,21 @@ class TaskValidatorServer:
 
             total_score = uniqueness * 0.4 + completeness * 0.4 + bonus * 0.2
 
-            # response = {
-            #     "validator_id": hash(self),
-            #     "task_id": task_id,
-            #     "uniqueness": uniqueness,
-            #     "completeness": completeness,
-            #     "bonus": bonus,
-            #     "total": total_score
-            # }
-
-            # requests.post("http://contribution-api.local/receive_scores", json=response)
             return total_score
         
-    def run(self, port = 20502):
+    def run(self, uid, key, port = 20502):
         import uvicorn
         uvicorn.run(self.app, host='0.0.0.0', port=port)
+        
         ip_addr = get_ip_address()
         task_approval_api_url = f'http://{ip_addr}:{port}'
+
+        subnet_pool_url = 'http://localhost:20501'
+        message = f'{uid}-{key.hotkey}-{task_approval_api_url}'
+        signature = key.sign(message)
+        requests.post(subnet_pool_url, data = {
+            'uid': uid,
+            'hotkey': key.hotkey,
+            'api_url': task_approval_api_url,
+            'signature': signature
+        })

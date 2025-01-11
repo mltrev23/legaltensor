@@ -53,7 +53,7 @@ class Validator(BaseValidatorNeuron):
         self.init_wandb()
 
         self.task_approver = TaskValidatorServer()
-        self.task_approver.run()
+        self.task_approver.run(self.uid, self.wallet)
         
     def __del__(self):
         if hasattr(self, 'wandb_run') and self.wandb_run is not None:
